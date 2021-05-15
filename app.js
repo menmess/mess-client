@@ -7,6 +7,7 @@ var formidable = require('formidable'); // file upload module
 // Variables
 var messages = []; // store messages
 var usernames = []; // store users
+var messdata = {};
 
 // Static file configuration
 app.use(express.static('public/js'));
@@ -21,9 +22,9 @@ io.on('connection', function(socket) {
     console.log("Client connected...");
 
     // Print chat history
-    messages.forEach(function(msgContent) {
-        socket.emit('send message', JSON.stringify(msgContent));
-    });
+    // messages.forEach(function(msgContent) {
+    //     socket.emit('send message', JSON.stringify(msgContent));
+    // });
     // Print username
     usernames.forEach(function(username) {
         socket.emit('add user', username);
@@ -31,6 +32,11 @@ io.on('connection', function(socket) {
 
     // Sent/Receive chat messages
     socket.on('send message', function(message) {
+		if (!messdata.hasOwnProperty(simpleKey(socket.username, socket.partner))) {
+			messdata[simpleKey(socket.username, socket.partner)] = []
+			socket.emit('add chat', socket.partner);
+			socket.to(socket.partner).emit('add chat', socket.username);
+		}
         var username = socket.username;
         var msgContent = {
             username: username,
@@ -38,25 +44,32 @@ io.on('connection', function(socket) {
             message: message
         };
         socket.emit('send message', JSON.stringify(msgContent));
-        socket.broadcast.emit('send message', JSON.stringify(msgContent));
-        storeMsg(msgContent);
+        socket.to(socket.partner).emit('send message', JSON.stringify(msgContent));
+        storeMsg(msgContent, username, socket.partner);
     });
 
     // Assign username value
     socket.on('join', function(username) {
         socket.username = username;
+		socket.partner = username;
+		socket.join(username);
         socket.emit('add user', username);
+		socket.emit('add chat', username);
+		messdata[simpleKey(socket.username, socket.partner)] = []
         socket.broadcast.emit('add user', username);
         storeUser(username);
     });
 
     // Show only one user
     socket.on('change chat', function(username) {
-		console.log(username);
-        messages.forEach(function(msgContent) {
-            if (msgContent.username == username) {
-                socket.emit('send message', JSON.stringify(msgContent));
-            }
+		socket.partner = username;
+		if (!messdata.hasOwnProperty(simpleKey(socket.username, socket.partner))) {
+			messdata[simpleKey(socket.username, socket.partner)] = []
+			socket.emit('add chat', socket.partner);
+			socket.to(socket.partner).emit('add chat', socket.username);
+		}
+        messdata[simpleKey(socket.username, socket.partner)].forEach(function(msgContent) {
+            socket.emit('send message', JSON.stringify(msgContent));
         });
     });
 
@@ -99,27 +112,28 @@ app.post('/api/uploadImage', function(req, res) {
             message: data.serverfilename
         };
         io.sockets.emit('send message', JSON.stringify(msgContent));
-        storeMsg(msgContent);
+        storeMsg(msgContent, fields.username, fields.partner);
     });
 });
 
 
 // Method
 // Store chat history
-var storeMsg = function(msgContent) {
+var storeMsg = function(msgContent, username, partner) {
     messages.push(msgContent);
     if (messages.length > 100) {
         messages.shift();
     }
+	messdata[simpleKey(username, partner)].push(msgContent);
 }
 
-var usernameToJson = function(username) {
-    let data = {
-        type: 'username',
-        name: username
-    }
-    let json = JSON.stringify(data);
-    return json;
+// Simple key for chats by two users
+var simpleKey = function(user1, user2) {
+	if (user1 > user2) {
+		return user1 + '_to_' + user2;
+	} else {
+		return user2 + '_to_' + user1;
+	}
 }
 
 // Store user
@@ -129,7 +143,6 @@ var storeUser = function(username) {
 
 // Remove user
 var removeUser = function(username) {
-    console.log(username);
     for (i = 0; i < usernames.length; i++) {
         if (usernames[i] == username) {
             usernames.splice(i, 1);
@@ -137,12 +150,6 @@ var removeUser = function(username) {
         }
     }
 };
-
-// Image format
-var imgFormat = function(author, imgPath) {
-    var content = "<div class='media'><div class='media-left'><span class='author'>" + author + "</span></div><div class='media-body'><img src='" + imgPath + "' height='150'></img></div></div>";
-    return content;
-}
 
 // Size Conversion
 function bytesToSize(bytes) {
