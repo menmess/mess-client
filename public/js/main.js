@@ -20,18 +20,18 @@ socket.on('send message', function(message) {
 		return;
 	}
     if (data.type == 'text') {
-        $('.chat-body').append(msgFormat(data.username, data.message));
+        $('.discussion').append(msgFormat(data.username, data.message));
     } else if (data.type == 'img') {
-        $('.chat-body').append(imgFormat(data.username, data.message));
+        $('.discussion').append(imgFormat(data.username, data.message));
     }
 });
 
 socket.on('add user', function(username) {
-    $('#user_list_online').append("<button style='display:block;' id='" + username + "' onclick=changeChat('" + username + "')>" + username + "</button>");
+    $('#user_list_online').append("<button class='user_chat center-block' id='" + username + "' onclick=changeChat('" + username + "')>" + username + "</button>");
 })
 
 socket.on('add chat', function(username) {
-    $('#user_list').append("<button style='display:block;' id='" + username + "' onclick=changeChat('" + username + "')>" + username + "</button>");
+    $('#user_list').append("<button class='user_chat center-block' id='" + username + "' onclick=changeChat('" + username + "')>" + username + "</button>");
 })
 
 socket.on('remove user', function(username) {
@@ -62,7 +62,7 @@ $('#chat_form').submit(function(e) {
 });
 
 var changeChat = function(username) {
-    $('.chat-body').empty();
+    $('.discussion').empty();
 	$('input[name=partner]').val(username);
 	$('#user_list').find('#' + username).find('div').remove();
     partner = username;
@@ -72,7 +72,11 @@ var changeChat = function(username) {
 
 // Message format
 var msgFormat = function(author, msg) {
-    var content = "<div class='media'><div class='media-left'><span class='author'>" + author + "</span></div><div class='media-body'><span class='msg-body'>" + msg + "</span></div></div>";
+    if (author == username) {
+        var content = "<div class='bubble recipient first'>" + msg + "</div>";
+    } else {
+        var content = "<div class='bubble sender first'>" + msg + "</div>";
+    }
     return content;
 }
 

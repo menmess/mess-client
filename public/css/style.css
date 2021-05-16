@@ -1,44 +1,113 @@
+body,html{
+	height: 100%;
+	margin: 0;
+	background: #7F7FD5;
+   background: -webkit-linear-gradient(to right, #91EAE4, #86A8E7, #7F7FD5);
+	background: linear-gradient(to right, #91EAE4, #86A8E7, #7F7FD5);
+}
+html { font-family: 'PT Sans', Georgia, serif; }
+
+.discussion {
+margin: 0 auto;
+display: flex;
+flex-flow: column wrap;
+}
+
+.discussion > .bubble {
+border-radius: 1em;
+padding: 0.25em 0.75em;
+margin: 0.0625em;
+max-width: 50%;
+}
+
+.discussion > .bubble.sender {
+align-self: flex-start;
+background-color: cornflowerblue;
+color: #fff;
+}
+.discussion > .bubble.recipient {
+align-self: flex-end;
+background-color: #efefef;
+}
+
+.discussion > .bubble.sender.first { border-bottom-left-radius: 0.1em; word-break: break-all;}
+
+.discussion > .bubble.recipient.first { border-bottom-right-radius: 0.1em; word-break: break-all;}
 .author {
-	float: left;
-	margin-right: 10px;
-	font-style: italic;
+float: left;
+margin-right: 10px;
+font-style: italic;
 }
 
 .msg-body {
-	text-align: left;
+text-align: left;
 }
 
 .chat-panel {
-	border: 1px solid #999999;
-	padding: 0px;
+	background: rgba(255, 200, 255, 0.25);
+	box-shadow: 1px 1px 12px rgb(0 0 0 / 10%);
+	height: 87%;
 }
 .chat-left {
-	padding: 20px;
+padding: 5px;
 }
 .chat-right {
-	border-left: 1px solid #999999;
-	border-right: 1px solid #999999;
+	background: rgba(0, 0, 32, 0.15);
+	height: 100%;
 }
-.chat-body {
-	padding: 20px;
-	height: 70vh;
-	overflow-y: scroll;
-}
-.chat-footer {
-	border-top: 1px solid #999999;
-	padding: 20px;
+.no_padding {
+	padding:0;
 }
 
+.user_chat {
+	border: none;
+	background: none;
+	word-break: break-all;
+}
+
+.chat-body {
+padding: 20px;
+height: 70vh;
+overflow-y: scroll;	
+
+}
+.chat-body::-webkit-scrollbar {
+display: none;
+}
+.chat-footer {
+padding: 20px;
+background: rgba(255, 255, 255, 0.03);
+height: 17vh;
+}
+  
+.chat-footer form input {
+	background: rgba(255, 255, 255, 0.03);
+bottom: 0;
+left: 0;
+border: none;
+padding: 10;
+outline: none;
+font-weight: 300;
+}
+.chat-footer textarea {
+	background: rgba(255, 255, 255, 0.03);
+bottom: 0;
+left: 0;
+border: none;
+padding: 10;
+outline: none;
+font-weight: 300;
+}
 #message_input {
-	display: block;
-	width: 100%;
-	margin-bottom: 10px;
+display: block;
+width: 100%;
+margin-bottom: 10px;
 }
 #attached_input {
-	display: inline-block;
-	margin-bottom: 10px;
+display: inline-block;
+margin-bottom: 10px;
 }
 #submit_btn {
-	display: inline-block;
-	float: right;
+display: inline-block;
+float: right;
 }
