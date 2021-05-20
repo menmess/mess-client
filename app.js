@@ -5,9 +5,8 @@ var io = require('socket.io')(server); // using socket.io in server
 var formidable = require('formidable'); // file upload module
 
 // Variables
-var messages = []; // store messages
 var usernames = []; // store users
-var messdata = {};
+var messdata = {}; // store chats
 
 // Static file configuration
 app.use(express.static('public/js'));
@@ -20,15 +19,8 @@ server.listen(8080);
 // On client connect
 io.on('connection', function(socket) {
     console.log("Client connected...");
-
-    // Print chat history
-    // messages.forEach(function(msgContent) {
-    //     socket.emit('send message', JSON.stringify(msgContent));
-    // });
-    // Print username
-    usernames.forEach(function(username) {
-        socket.emit('add user', username);
-    });
+    // Connect to the network
+    socket.emit('register a token', 'Connection');
 
     // Sent/Receive chat messages
     socket.on('send message', function(message) {
@@ -52,15 +44,38 @@ io.on('connection', function(socket) {
     socket.on('join', function(username) {
         socket.username = username;
 		socket.partner = username;
+        // Enter own room
 		socket.join(username);
+        // To draw on the user page
         socket.emit('add user', username);
 		socket.emit('add chat', username);
-		messdata[simpleKey(socket.username, socket.partner)] = []
+        // To draw on the page of other users
         socket.broadcast.emit('add user', username);
+        // Server data
+		messdata[simpleKey(socket.username, socket.partner)] = []
         storeUser(username);
     });
 
-    // Show only one user
+    socket.on('register a token', function(token) {
+        // dummy processing
+		socket.emit('register a token', 'Success');
+        // Register name
+        socket.emit('register a username', 'Request')
+    });
+
+    socket.on('register a username', function(username) {
+        if (username != null && username != '' && username.indexOf(';') == -1) {
+            socket.emit('register a username', username);
+            // Send usernames
+            usernames.forEach(function(username) {
+                socket.emit('add user', username);
+            });
+        } else {
+            socket.emit('register a username', 'Request');
+        }
+    });
+
+    // Show messages of only one user
     socket.on('change chat', function(username) {
 		socket.partner = username;
 		if (!messdata.hasOwnProperty(simpleKey(socket.username, socket.partner))) {
@@ -116,14 +131,8 @@ app.post('/api/uploadImage', function(req, res) {
     });
 });
 
-
-// Method
 // Store chat history
 var storeMsg = function(msgContent, username, partner) {
-    messages.push(msgContent);
-    if (messages.length > 100) {
-        messages.shift();
-    }
 	messdata[simpleKey(username, partner)].push(msgContent);
 }
 

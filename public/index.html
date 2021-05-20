@@ -15,11 +15,15 @@
 				<div class="chat-panel">
 					<div class="col-md-2 no_padding">
 						<h3 class="text-center">Chats</h1>
-						<div class="chat-left" id="user_list">
+						<div class="chat_user_list" id="user_list">
 						</div>
 					</div>
 					<div class="col-md-8 no_padding">
-						<div class="chat-right">
+						<div class="chat_central_area">
+							<div class='chat-header text-center'>
+								<p class="partner-name" id="partner_name"></p>
+								<p class="partner-status" id='partner_status'></p>
+							</div>
 							<div class="chat-body">
 								<section class="discussion">
 		
@@ -28,7 +32,7 @@
 							<div class="chat-footer">
 								<form action="/api/uploadImage" id="chat_form" method="post" enctype="multipart/form-data">
 									<textarea id="message_input" placeholder="Type Message"></textarea>
-									<input type="submit" id="submit_btn"><i class="fas fa-location-arrow"></i>
+									<input type="submit" id="submit_btn">
 									<input type="file" name="attached" id="attached_input">
 									<input type="hidden" name="username" value="">
 									<input type="hidden" name="partner" value="">
@@ -39,7 +43,7 @@
 					</div>
 					<div class="col-md-2 no_padding">
 						<h3 class="text-center">Users</h1>
-						<div class="chat-left" id="user_list_online">	
+						<div class="chat_user_list" id="user_list_online">	
 						</div>
 					</div>
 				</div>
