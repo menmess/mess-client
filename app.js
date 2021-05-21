@@ -90,17 +90,14 @@ io.on('connection', function(socket) {
     });
 
     socket.on('read messages', function(username) {
-        // flag to sync. Otherwise, messages may be duplicated.
-        let is_smth_chage = 0;
+        // there is a synchronization flaw, at first several "unread" messages are sent and it is
+        // entered here several times, in vain sending sockets
         messdata[simpleKey(socket.username, socket.partner)].forEach(function(msgContent) {
             if (socket.partner == msgContent.username && msgContent.status == 'unread') {
                 msgContent.status = 'read';
                 is_smth_chage = 1;
             }
         });
-        if (!is_smth_chage) {
-            return;
-        }
         if (socket.partner == socket.username) {
             socket.emit('read messages', socket.username);
         } else {

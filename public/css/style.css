@@ -27,13 +27,13 @@ html {
 
 .discussion>.bubble.sender {
 	align-self: flex-start;
-	background-color: cornflowerblue;
+	background-color: rgba(100, 148, 237, 0.712);
 	color: #fff;
 }
 
 .discussion>.bubble.recipient {
 	align-self: flex-end;
-	background-color: #efefef;
+	background-color: #efefefa6;
 }
 
 .discussion>.bubble.sender.first {
@@ -73,17 +73,61 @@ html {
 
 .chat_user_list {
 	padding: 5px;
+	overflow-y: scroll;
+	height: 90%;
 }
 
+.chat_user_list::-webkit-scrollbar {
+	display: none;
+}
+
+
+
 .user_chat {
+	position:relative; 
+	display: inline-block;
+	width: 100%;
+	border-bottom: 1px solid #5c58584f;
+}
+
+.user_chat .username {
 	border: none;
 	background: none;
 	word-break: break-all;
+	font-size: 20;
+	color: rgba(0, 0, 0, 0.884);
+	max-width: 80%;
+}
+
+.user_chat .username:hover {
+	color: black;
+	font-size: 21;
+}
+
+.user_chat div {
+	position: absolute;
+	display: inline-block;
+	top: 0;
+	bottom: 0;
+	padding: 3;
+}
+
+.user_chat span {
+	display: inline-block;
+	vertical-align: middle; 
+	height: 100%;
+}
+
+.user_chat i {
+	display: inline-block;
+	vertical-align: middle;
+	color: rgba(121, 141, 160, 0.849);
 }
 
 .chat_central_area {
 	background: rgba(0, 0, 32, 0.15);
 	height: 100%;
+	border-radius: 30px;
 }
 
 .chat-body {
@@ -100,14 +144,17 @@ html {
 	padding: 10px;
 	background: rgba(255, 255, 255, 0.15);
 	height: 10%;
+	border-radius: 30px;
 }
 
 .partner-name {
 	margin: 0;
+	font-size: 20;
 }
 
 .partner-status {
 	margin: 0;
+	font-size: 15;
 }
 .partner-status.online {
 	color: #91eae4d5;
@@ -163,8 +210,13 @@ html {
 }
 
 .icon-group i {
-	font-size:40px;
+	font-size:35px;
 	color: rgba(253, 253, 253, 0.418);
+}
+
+.icon-group i:hover {
+	font-size:36px;
+	color: rgba(253, 253, 253, 0.596);
 }
 
 .icon-group div {

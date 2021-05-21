@@ -41,7 +41,7 @@ socket.on('send message', function(message) {
     var data = JSON.parse(message);
 	if (data.username != partner && data.username != username) {
         if (!$('#user_list').find('#' + data.username).find('div').length) {
-		    $('#user_list').find('#' + data.username).append("<div>(new message)</div>");
+		    $('#user_list').find('#' + data.username).append("<div><span></span><i class='fa fa-envelope'></i></div>");
         }
 		return;
 	}
@@ -56,27 +56,26 @@ socket.on('send message', function(message) {
 });
 
 socket.on('add user', function(username) {
-    $('#user_list_online').append("<button class='user_chat center-block' id='" + username + "' onclick=changeChat('" + username + "')>" + username + "</button>");
+    $('#user_list_online').append("<div id='" + username + "' class='center-block user_chat'><button onclick=changeChat('" + username + "') class='center-block username'>" + username + "</button></div>");
 })
 
 socket.on('add chat', function(username) {
-    $('#user_list').append("<button class='user_chat center-block' id='" + username + "' onclick=changeChat('" + username + "')>" + username + "</button>");
+    $('#user_list').append("<div id='" + username + "' class='center-block user_chat'><button onclick=changeChat('" + username + "') class='center-block username'>" + username + "</button></div>");
 })
 
 socket.on('remove user', function(username) {
-    $('#user_list_online button#' + username).remove();
+    $('#user_list_online #' + username).remove();
 });
 
 socket.on('read messages', function(username) {
-    // Bad decision, but for normal message IDs are needed
-    if (username == partner) {
-        changeChat(username);
-    }
+    let unread_msgs = $('div.unread');
+    unread_msgs.addClass('read');
+    unread_msgs.removeClass('unread');
 });
 
 // Handling message sending
 $('#chat_form').submit(function(e) {
-    var message = $('#message_input').val();
+    var message = $('#message_input').val().replace(/\n/g, '<br/>');
     var attached = $('#attached_input').val();
 		
     if (message != '') {
@@ -96,6 +95,14 @@ $('#chat_form').submit(function(e) {
     }
     return false;
 });
+
+$('#message_input').keyup(function(e){
+    e = e || event;
+    if (e.keyCode === 13 && !e.shiftKey) {
+        $('#chat_form').submit();
+    }
+    return true;
+   });
 
 var changeChat = function(username) {
     $('.discussion').empty();
