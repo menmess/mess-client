@@ -46,7 +46,7 @@ socket.on('send message', function(message) {
 		return;
 	}
     if (data.type == 'text') {
-        $('.discussion').append(msgFormat(data.username, data.message, data.status));
+        $('.discussion').append(msgFormat(data.username, data.message, data.status, data.time));
     } else if (data.type == 'img') {
         $('.discussion').append(imgFormat(data.username, data.message));
     }
@@ -126,11 +126,11 @@ var changeChatHeader = function(username, status) {
 }
 
 // Message format
-var msgFormat = function(author, msg, status) {
+var msgFormat = function(author, msg, status, time) {
     if (author == username) {
-        var content = "<div class='bubble recipient first'><p>" + msg + "<p><div class='msg-status " + status + "'><i class='fa fa-check'></i></div></div>";
+        var content = "<div class='bubble recipient first'><p>" + msg + "</p><div class='msg-status " + status + "'><em class='time'>" + time + "</em> <i class='fa fa-check'></i></div></div>";
     } else {
-        var content = "<div class='bubble sender first'>" + msg + "</div>";
+        var content = "<div class='bubble sender first'><p>" + msg + "</p><div class='msg-status'><em class='time'>" + time + "</em></div></div>";
     }
     return content;
 }

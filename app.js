@@ -30,11 +30,13 @@ io.on('connection', function(socket) {
 			socket.to(socket.partner).emit('add chat', socket.username);
 		}
         var username = socket.username;
+        let d = new Date;
         var msgContent = {
             username: username,
             type: 'text',
             message: message,
-            status: 'unread'
+            status: 'unread',
+            time: d.getHours().toString() + ':' + d.getMinutes().toString()
         };
         socket.emit('send message', JSON.stringify(msgContent));
         socket.to(socket.partner).emit('send message', JSON.stringify(msgContent));
@@ -138,11 +140,13 @@ app.post('/api/uploadImage', function(req, res) {
             filename: files.attached.name,
             size: bytesToSize(files.attached.size)
         };
+        let d = new Date;
         var msgContent = {
             username: fields.username,
             type: 'img',
             message: data.serverfilename,
-            status: 'unread'
+            status: 'unread',
+            time: d.getHours().toString() + ':' + d.getMinutes().toString()
         };
         io.sockets.emit('send message', JSON.stringify(msgContent));
         storeMsg(msgContent, fields.username, fields.partner);

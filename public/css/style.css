@@ -63,6 +63,9 @@ html {
 	color: #41c3ffd7;
 }
 
+.discussion .msg-status .time {
+	color: #53535377;
+}
 /*messenger body style*/
 .chat-panel {
 	background: rgba(255, 200, 255, 0.25);
@@ -80,8 +83,6 @@ html {
 .chat_user_list::-webkit-scrollbar {
 	display: none;
 }
-
-
 
 .user_chat {
 	position:relative; 
@@ -128,6 +129,7 @@ html {
 	background: rgba(0, 0, 32, 0.15);
 	height: 100%;
 	border-radius: 30px;
+	box-shadow: 1px 1px 12px rgb(0 0 0 / 10%);
 }
 
 .chat-body {
