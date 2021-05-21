@@ -33,7 +33,8 @@ io.on('connection', function(socket) {
         var msgContent = {
             username: username,
             type: 'text',
-            message: message
+            message: message,
+            status: 'unread'
         };
         socket.emit('send message', JSON.stringify(msgContent));
         socket.to(socket.partner).emit('send message', JSON.stringify(msgContent));
@@ -88,6 +89,25 @@ io.on('connection', function(socket) {
         });
     });
 
+    socket.on('read messages', function(username) {
+        // flag to sync. Otherwise, messages may be duplicated.
+        let is_smth_chage = 0;
+        messdata[simpleKey(socket.username, socket.partner)].forEach(function(msgContent) {
+            if (socket.partner == msgContent.username && msgContent.status == 'unread') {
+                msgContent.status = 'read';
+                is_smth_chage = 1;
+            }
+        });
+        if (!is_smth_chage) {
+            return;
+        }
+        if (socket.partner == socket.username) {
+            socket.emit('read messages', socket.username);
+        } else {
+            socket.to(socket.partner).emit('read messages', socket.username);
+        }
+    });
+
     // Remove user when disconnect
     socket.on('disconnect', function() {
         socket.emit('remove user', socket.username);
@@ -124,7 +144,8 @@ app.post('/api/uploadImage', function(req, res) {
         var msgContent = {
             username: fields.username,
             type: 'img',
-            message: data.serverfilename
+            message: data.serverfilename,
+            status: 'unread'
         };
         io.sockets.emit('send message', JSON.stringify(msgContent));
         storeMsg(msgContent, fields.username, fields.partner);

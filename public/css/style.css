@@ -46,6 +46,23 @@ html {
 	word-break: break-all;
 }
 
+.discussion p {
+	margin: 0;
+}
+
+.discussion .msg-status {
+	font-size: 12;
+	text-align: right;
+}
+
+.discussion .msg-status.unread {
+	color: #53535377;
+}
+
+.discussion .msg-status.read {
+	color: #41c3ffd7;
+}
+
 /*messenger body style*/
 .chat-panel {
 	background: rgba(255, 200, 255, 0.25);

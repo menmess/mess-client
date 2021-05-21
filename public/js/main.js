@@ -40,16 +40,18 @@ socket.on('register a username', function(status) {
 socket.on('send message', function(message) {
     var data = JSON.parse(message);
 	if (data.username != partner && data.username != username) {
-		console.log($('#user_list').find('#' + data.username));
         if (!$('#user_list').find('#' + data.username).find('div').length) {
 		    $('#user_list').find('#' + data.username).append("<div>(new message)</div>");
         }
 		return;
 	}
     if (data.type == 'text') {
-        $('.discussion').append(msgFormat(data.username, data.message));
+        $('.discussion').append(msgFormat(data.username, data.message, data.status));
     } else if (data.type == 'img') {
         $('.discussion').append(imgFormat(data.username, data.message));
+    }
+    if (data.status == 'unread' && data.username == partner) {
+        socket.emit('read messages', username);
     }
 });
 
@@ -63,6 +65,13 @@ socket.on('add chat', function(username) {
 
 socket.on('remove user', function(username) {
     $('#user_list_online button#' + username).remove();
+});
+
+socket.on('read messages', function(username) {
+    // Bad decision, but for normal message IDs are needed
+    if (username == partner) {
+        changeChat(username);
+    }
 });
 
 // Handling message sending
@@ -110,9 +119,9 @@ var changeChatHeader = function(username, status) {
 }
 
 // Message format
-var msgFormat = function(author, msg) {
+var msgFormat = function(author, msg, status) {
     if (author == username) {
-        var content = "<div class='bubble recipient first'>" + msg + "</div>";
+        var content = "<div class='bubble recipient first'><p>" + msg + "<p><div class='msg-status " + status + "'><i class='fa fa-check'></i></div></div>";
     } else {
         var content = "<div class='bubble sender first'>" + msg + "</div>";
     }
