@@ -1,65 +1,102 @@
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+<link rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+      integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7"
+      crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="style.css">
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<title>Mess</title>
-	
-</head>
-<body>
-		<div class="container">
-			<h1 class="text-center">MESSenger</h1>
-			<div class="row content">
-				<div class="chat-panel">
-					<div class="col-md-2 no_padding">
-						<h3 class="text-center">Chats</h3>
-						<div class="chat_user_list" id="user_list">
-						</div>
-					</div>
-					<div class="col-md-8 no_padding">
-						<div class="chat_central_area">
-							<div class='chat-header text-center'>
-								<p class="partner-name" id="partner_name"></p>
-								<p class="partner-status" id='partner_status'></p>
-							</div>
-							<div class="chat-body">
-								<section class="discussion">
-								</section>
-							</div>
-							<div class="chat-footer">
-								<form class="form-inline" action="/api/uploadImage" id="chat_form" method="post" enctype="multipart/form-data">
-									<label class="icon-group" for="attached_input">
-										<span></span>
-										<div><i class="fa fa-paperclip"></i></div>
-									</label>
-									<input style="display: none;" type="file" name="attached" id="attached_input">
-									<textarea id="message_input" placeholder="Type Message"></textarea>
-									<label class="icon-group" for="submit_btn">
-										<span></span>
-										<div><i class="fa fa-paper-plane"></i></div>
-									</label>
-									<input style="display: none;" type="submit" id="submit_btn">
-									<input type="hidden" name="username" value="">
-									<input type="hidden" name="partner" value="">
-									<span id="status"></span>
-								</form>
-							</div>
-						</div>
-					</div>
-					<div class="col-md-2 no_padding">
-						<h3 class="text-center">Users</h3>
-						<div class="chat_user_list" id="user_list_online">	
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
 
-	<script src="socket.io/socket.io.js"></script>
-	<script src="//code.jquery.com/jquery-latest.min.js"></script>
-	<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.51/jquery.form.min.js"></script>
-	<script src="main.js"></script>		
+  <meta charset="UTF-8">
+
+  <title>Mess</title>
+
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1 class="text-center">MESSenger</h1>
+
+  <div class="row content">
+
+    <div class="chat-panel">
+
+      <div class="col-md-2 no_padding">
+        <h3 class="text-center">Chats</h3>
+        <div class="chat_user_list" id="user_list">
+        </div>
+      </div>
+
+      <div class="col-md-8 no_padding">
+
+        <div class="chat_central_area">
+
+          <div class='chat-header text-center'>
+            <p class="partner-name" id="partner_name"></p>
+            <p class="partner-status" id='partner_status'></p>
+          </div>
+
+          <div class="chat-body">
+            <section class="discussion">
+            </section>
+          </div>
+
+          <div class="chat-footer">
+
+            <form class="form-inline" action="/api/uploadImage" id="chat_form" method="post"
+                  enctype="multipart/form-data">
+
+              <label class="icon-group" for="attached_input">
+                <span></span>
+                <div><i class="fa fa-paperclip"></i></div>
+              </label>
+
+              <input style="display: none;" type="file" name="attached" id="attached_input">
+
+              <textarea id="message_input" placeholder="Type Message"></textarea>
+
+              <label class="icon-group" for="submit_btn">
+                <span></span>
+                <div><i class="fa fa-paper-plane"></i></div>
+              </label>
+
+              <input style="display: none;" type="submit" id="submit_btn">
+
+              <input type="hidden" name="username" value="">
+
+              <input type="hidden" name="partner" value="">
+
+              <span id="status"></span>
+
+            </form>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="col-md-2 no_padding">
+        <h3 class="text-center">Users</h3>
+        <div class="chat_user_list" id="user_list_online">
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script src="socket.io/socket.io.js"></script>
+<script src="//code.jquery.com/jquery-latest.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.51/jquery.form.min.js"></script>
+<script src="main.js"></script>
+
 </body>
+
 </html>
