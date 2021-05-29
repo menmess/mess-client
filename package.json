@@ -3,12 +3,15 @@
   "version": "1.0.0",
   "main": "index.js",
   "dependencies": {
-    "express": "^4.13.4",
-    "formidable": "^1.0.17",
+    "express": "^4.17.1",
+    "formidable": "^1.2.2",
     "node-markdown": "^0.1.1",
-    "socket.io": "^1.7.4"
+    "socket.io": "^4.1.2"
   },
   "description": "В данный момент представляет из себя веб мессенджер, работающий на основе node.js сервера.",
+  "scripts": {
+    "start": "node app.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/menmess/mess-client.git"
