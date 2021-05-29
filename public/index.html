@@ -7,11 +7,12 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 
   <meta charset="UTF-8">
 
-  <title>Mess</title>
+  <title>Messenger</title>
 
 </head>
 
@@ -27,27 +28,28 @@
 
       <div class="col-md-2 no_padding">
         <h3 class="text-center">Chats</h3>
-        <div class="chat_user_list" id="user_list">
-        </div>
+        <div class="chat_user_list" id="user_list"></div>
       </div>
 
       <div class="col-md-8 no_padding">
 
         <div class="chat_central_area">
 
-          <div class='chat-header text-center'>
+          <div class="chat-header text-center">
             <p class="partner-name" id="partner_name"></p>
-            <p class="partner-status" id='partner_status'></p>
+            <p class="partner-status" id="partner_status"></p>
           </div>
 
           <div class="chat-body">
-            <section class="discussion">
-            </section>
+            <section class="discussion"></section>
           </div>
 
           <div class="chat-footer">
 
-            <form class="form-inline" action="/api/uploadImage" id="chat_form" method="post"
+            <form class="form-inline"
+                  action="/api/uploadImage"
+                  id="chat_form"
+                  method="post"
                   enctype="multipart/form-data">
 
               <label class="icon-group" for="attached_input">
@@ -57,6 +59,7 @@
 
               <input style="display: none;" type="file" name="attached" id="attached_input">
 
+              <label for="message_input"></label>
               <textarea id="message_input" placeholder="Type Message"></textarea>
 
               <label class="icon-group" for="submit_btn">
@@ -82,8 +85,7 @@
 
       <div class="col-md-2 no_padding">
         <h3 class="text-center">Users</h3>
-        <div class="chat_user_list" id="user_list_online">
-        </div>
+        <div class="chat_user_list" id="user_list_online"></div>
       </div>
 
     </div>
