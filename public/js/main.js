@@ -56,11 +56,11 @@ socket.on('send message', function(message) {
 });
 
 socket.on('add user', function(username) {
-    $('#user_list_online').append("<div id='" + username + "' class='center-block user_chat'><button onclick=changeChat('" + username + "') class='center-block username'>" + username + "</button></div>");
+    $('#user_list_online').append("<div id='" + username + "' class='center-block user-chat'><button onclick=changeChat('" + username + "') class='center-block username'>" + username + "</button></div>");
 })
 
 socket.on('add chat', function(username) {
-    $('#user_list').append("<div id='" + username + "' class='center-block user_chat'><button onclick=changeChat('" + username + "') class='center-block username'>" + username + "</button></div>");
+    $('#user_list').append("<div id='" + username + "' class='center-block user-chat'><button onclick=changeChat('" + username + "') class='center-block username'>" + username + "</button></div>");
 })
 
 socket.on('remove user', function(username) {
@@ -98,7 +98,7 @@ $('#chat_form').submit(function(e) {
 
 $('#message_input').keyup(function(e){
     e = e || event;
-    if (e.keyCode === 13 && !e.shiftKey) {
+    if (e.keyCode === 13 && !e.shifstKey) {
         $('#chat_form').submit();
     }
     return true;
