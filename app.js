@@ -20,14 +20,14 @@ server.listen(8080);
 io.on('connection', function(socket) {
   console.log('Client connected...');
   // Connect to the network
-  socket.emit('register a token', 'Connection');
+  socket.emit('require_token', 'Connection');
 
   // Sent/Receive chat messages
-  socket.on('send message', function(message) {
+  socket.on('receive_message', function(message) {
     if (!chats.hasOwnProperty(simpleKey(socket.username, socket.partner))) {
       chats[simpleKey(socket.username, socket.partner)] = [];
-      socket.emit('add chat', socket.partner);
-      socket.to(socket.partner).emit('add chat', socket.username);
+      socket.emit('add_chat', socket.partner);
+      socket.to(socket.partner).emit('add_chat', socket.username);
     }
 
     let username = socket.username;
@@ -40,8 +40,8 @@ io.on('connection', function(socket) {
       time: d.getHours().toString() + ':' + d.getMinutes().toString(),
     };
 
-    socket.emit('send message', JSON.stringify(msgContent));
-    socket.to(socket.partner).emit('send message', JSON.stringify(msgContent));
+    socket.emit('receive_message', JSON.stringify(msgContent));
+    socket.to(socket.partner).emit('receive_message', JSON.stringify(msgContent));
     storeMsg(msgContent, username, socket.partner);
   });
 
@@ -52,31 +52,31 @@ io.on('connection', function(socket) {
     // Enter own room
     socket.join(username);
     // To draw on the user page
-    socket.emit('add user', username);
-    socket.emit('add chat', username);
+    socket.emit('add_user', username);
+    socket.emit('add_chat', username);
     // To draw on the page of other users
-    socket.broadcast.emit('add user', username);
+    socket.broadcast.emit('add_user', username);
     // Server data
     chats[simpleKey(socket.username, socket.partner)] = [];
     storeUser(username);
   });
 
-  socket.on('register a token', function(token) {
+  socket.on('require_token', function(token) {
     // dummy processing
-    socket.emit('register a token', 'Success');
+    socket.emit('require_token', 'Success');
     // Register name
-    socket.emit('register a username', 'Request');
+    socket.emit('register_username', 'Request');
   });
 
-  socket.on('register a username', function(username) {
+  socket.on('register_username', function(username) {
     if (username != null && username !== '' && username.indexOf(';') === -1) {
-      socket.emit('register a username', username);
+      socket.emit('register_username', username);
       // Send usernames
       usernames.forEach(function(username) {
-        socket.emit('add user', username);
+        socket.emit('add_user', username);
       });
     } else {
-      socket.emit('register a username', 'Request');
+      socket.emit('register_username', 'Request');
     }
   });
 
@@ -85,16 +85,16 @@ io.on('connection', function(socket) {
     socket.partner = username;
     if (!chats.hasOwnProperty(simpleKey(socket.username, socket.partner))) {
       chats[simpleKey(socket.username, socket.partner)] = [];
-      socket.emit('add chat', socket.partner);
-      socket.to(socket.partner).emit('add chat', socket.username);
+      socket.emit('add_chat', socket.partner);
+      socket.to(socket.partner).emit('add_chat', socket.username);
     }
     chats[simpleKey(socket.username, socket.partner)].forEach(
         function(msgContent) {
-          socket.emit('send message', JSON.stringify(msgContent));
+          socket.emit('receive_message', JSON.stringify(msgContent));
         });
   });
 
-  socket.on('read messages', function(username) {
+  socket.on('read_messages', function(username) {
     // there is a synchronization flaw, at first several "unread" messages are sent and it is
     // entered here several times, in vain sending sockets
     chats[simpleKey(socket.username, socket.partner)].forEach(
@@ -106,16 +106,16 @@ io.on('connection', function(socket) {
           }
         });
     if (socket.partner === socket.username) {
-      socket.emit('read messages', socket.username);
+      socket.emit('read_messages', socket.username);
     } else {
-      socket.to(socket.partner).emit('read messages', socket.username);
+      socket.to(socket.partner).emit('read_messages', socket.username);
     }
   });
 
-  // Remove user when disconnect
+  // remove_user when disconnect
   socket.on('disconnect', function() {
-    socket.emit('remove user', socket.username);
-    socket.broadcast.emit('remove user', socket.username);
+    socket.emit('remove_user', socket.username);
+    socket.broadcast.emit('remove_user', socket.username);
     removeUser(socket.username);
   });
 
@@ -154,7 +154,7 @@ app.post('/api/uploadImage', function(req, res) {
       time: d.getHours().toString() + ':' + d.getMinutes().toString(),
     };
 
-    io.sockets.emit('send message', JSON.stringify(msgContent));
+    io.sockets.emit('receive_message', JSON.stringify(msgContent));
     storeMsg(msgContent, fields.username, fields.partner);
   });
 });
@@ -178,7 +178,7 @@ let storeUser = function(username) {
   usernames.push(username);
 };
 
-// Remove user
+// remove_user
 let removeUser = function(username) {
   for (let i = 0; i < usernames.length; i++) {
     if (usernames[i] === username) {

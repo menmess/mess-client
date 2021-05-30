@@ -1,25 +1,44 @@
+// Client receive:
+// socket.on('connect', function() {});
+// socket.on('require_token', function(status) {});
+// socket.on('register_username', function(status) {});
+// socket.on('receive_message', function(message) {});
+// socket.on('add_user', function(username) {});
+// socket.on('add_chat', function(username) {});
+// socket.on('remove_user', function(username) {});
+// socket.on('read_messages', function(username) {});
+
+// Client send:
+// socket.emit('register_token', token);
+// socket.emit('register_username', nick);
+// socket.emit('join', username);
+// socket.emit('read_messages', username);
+// socket.emit('send_message', message);
+// socket.emit('change_chat', username);
+
 let socket = io.connect('http://localhost:8080'); // io?
 let username = '';
 let partner = '';
-let online_status = 'offline';
+// let online_status = 'offline';
 
 socket.on('connect', function() {
   // If you need something when connecting
   // Now all the logic is on the server
 });
 
-socket.on('register a token', function(status) {
-  if (status === 'Success') {
-    online_status = 'online';
-  } else if (status === 'Connection') {
-    socket.emit('register a token', prompt('Enter token:'));
+socket.on('require_token', function(status) {
+  // if (status === 'Success') {
+  //   online_status = 'online';
+  // } else
+  if (status === 'Connection') {
+    socket.emit('require_token', prompt('Enter token:'));
   }
 });
 
-socket.on('register a username', function(status) {
+socket.on('register_username', function(status) {
   // username cannot be 'Request'
   if (status === 'Request') {
-    socket.emit('register a username', prompt('Enter nickname:'));
+    socket.emit('register_username', prompt('Enter nickname:'));
     return;
   }
 
@@ -35,7 +54,7 @@ socket.on('register a username', function(status) {
   socket.emit('join', username);
 });
 
-socket.on('send message', function(message) {
+socket.on('receive_message', function(message) {
   let data = JSON.parse(message);
   let user_list = $('#user_list');
 
@@ -55,11 +74,11 @@ socket.on('send message', function(message) {
   }
 
   if (data.status === 'unread' && data.username === partner) {
-    socket.emit('read messages', username);
+    socket.emit('read_messages', username);
   }
 });
 
-socket.on('add user', function(username) {
+socket.on('add_user', function(username) {
   $('#user_list_online').
       append('<div id=\'' + username +
           '\' class=\'center-block user-chat\'><button onclick=changeChat(\'' +
@@ -67,7 +86,7 @@ socket.on('add user', function(username) {
           '</button></div>');
 });
 
-socket.on('add chat', function(username) {
+socket.on('add_chat', function(username) {
   $('#user_list').
       append('<div id=\'' + username +
           '\' class=\'center-block user-chat\'><button onclick=changeChat(\'' +
@@ -75,26 +94,33 @@ socket.on('add chat', function(username) {
           '</button></div>');
 });
 
-socket.on('remove user', function(username) {
+socket.on('remove_user', function(username) {
   $('#user_list_online #' + username).remove();
 });
 
-socket.on('read messages', function(username) { // username?
+socket.on('read_messages', function(username) { // username?
   let unread_msgs = $('div.unread');
   unread_msgs.addClass('read');
   unread_msgs.removeClass('unread');
 });
 
-// Handling message sending
+// ToDo: integrate message handling
 $('#chat_form').submit(function(e) { // e?
   let message_input = $('#message_input');
   let attached_input = $('#attached_input');
 
-  let message = message_input.val().replace(/\n/g, '<br/>');
+  let text = message_input.val().replace(/\n/g, '<br/>');
+  let message = "{id: " + id +
+      ", authorId: " + authorId +
+      ", chatId: " + Id +
+      ", sent: " + time +
+      ", status: " + status +
+      ", mediaId: " + Id +
+      ", text: "+ text + "}"
 
   if (message !== '') {
     message_input.val('');
-    socket.emit('send message', message);
+    socket.emit('receive_message', message);
 
     return false;
   }
@@ -149,8 +175,9 @@ let changeChatHeader = function(username, status) {
   partner_status.text(status);
 };
 
-// Message format
-let msgFormat = function(author, msg, status, time) {
+// ToDo: integrate message format
+let msgFormat = function(
+    id, authorId, chatId, comment, time, status, mediaId, text) {
   let content;
 
   if (author === username) {
