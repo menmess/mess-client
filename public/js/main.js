@@ -1,106 +1,108 @@
 // Client receive:
-// socket.on('connect', function() {});
-// socket.on('require_token', function(status) {});
-// socket.on('register_username', function(status) {});
-// socket.on('receive_message', function(message) {});
-// socket.on('add_user', function(username) {});
-// socket.on('add_chat', function(username) {});
-// socket.on('remove_user', function(username) {});
-// socket.on('read_messages', function(username) {});
+// + "require_registration",  нет аргументов, ожидается, что ответом будет "register"
+// + "invalid_token",         нет аргументов, ожидается, что юзера попросят заново ввести токен
+// "error_occured",                 аргумент: errorMessage: String
+// "receive_message",       аргумент: message: JSON<Message>
+// + "new_user",              ???, отправляется, когда к сети присоединяется юзер
+// "add_chat",              ???, отправляется в ответ на "create_chat"
+// "read_chat",             аргумент: chatId: Id, отправляется когда собеседник открыл чат и прочитал сообщения в нем, то есть нужно пометить сообщения в чате как прочитанные
+// "offline_user",          аргумент: userId: Id, отправляется когда кто-то отключился из чата
 
 // Client send:
-// socket.emit('register_token', token);
-// socket.emit('register_username', nick);
-// socket.emit('join', username);
-// socket.emit('read_messages', username);
-// socket.emit('send_message', message);
-// socket.emit('change_chat', username);
+// socket.emit('register',          info);
+// socket.emit('read_messages',     chatId);
+// socket.emit('send_message',      message);
+// socket.emit('change_chat',       chatId);
+// socket.emit('create_chat',       userId);
 
 let socket = io.connect('http://localhost:8080'); // io?
-let username = '';
-let partner = '';
-// let online_status = 'offline';
+let my_id = 0;
+let partner_id = 0;
+let users = {}; // store users
+let chats = {}; // store chats
 
 // -----------------------------------------------------------------------------
 
 socket.on('connect', function() {
-  // If you need something when connecting
-  // Now all the logic is on the server
+
 });
 
-socket.on('require_token', function(status) {
-  // if (status === 'Success') {
-  //   online_status = 'online';
-  // } else
-  if (status === 'Connection') {
-    socket.emit('require_token', prompt('Enter token:'));
-  }
-});
-
-socket.on('register_username', function(status) {
-  // username cannot be 'Request'
-  if (status === 'Request') {
-    socket.emit('register_username', prompt('Enter nickname:'));
-    return;
-  }
-
-  username = status;
+socket.on('require_registration', function(userId) {
+  let my_name = prompt('Enter usename:');
+  let token = prompt('Enter token:');
+  my_id = userId;
+  socket.emit('register', {my_name, token});
+   
   // customizing page data
-  $('input[name=username]').val(username);
-  $('input[name=partner]').val(username);
-  changeChatHeader(username, 'Online');
-  partner = username;
+  $('input[name=username]').val(my_name);
+  $('input[name=partner]').val(my_name);
+  changeChatHeader(my_name, 'Online');
+  partner_id = my_id;
+  users.my_id = my_name;
   // there may be some more checks for the validity of the username
   // usernames with ';' break logic of page
   // I'm not sure to check here or on the server
-  socket.emit('join', username);
+});
+
+socket.on('invalid_token', function() {
+  let token = prompt('Wrong token, please try again:');
+  socket.emit('register', {users.my)id, token});
+});
+
+socket.on('error_occured', function(errorMessage) {
+  // TO DO: close
 });
 
 socket.on('receive_message', function(message) {
   let data = JSON.parse(message);
   let user_list = $('#user_list');
 
-  if (data.username !== partner && data.username !== username) {
-    if (!user_list.find('#' + data.username).find('div').length) {
-      user_list.find('#' + data.username).
+  if (data.authorId !== partner_id && data.authorId !== users.my_id) {
+    if (!user_list.find('#' + data.authorId).find('div').length) {
+      user_list.find('#' + data.authorId).
           append('<div><span></span><i class=\'fa fa-envelope\'></i></div>');
     }
     return;
   }
 
-  if (data.type === 'text') {
+  // if (data.type === 'text') {
     $('.discussion').
         append(msgFormat(data.username, data.message, data.status, data.time));
-  } else if (data.type === 'img') {
-    $('.discussion').append(imgFormat(data.username, data.message));
-  }
+  // } else if (data.type === 'img') {
+    // $('.discussion').append(imgFormat(data.username, data.message));
+  // }
 
-  if (data.status === 'unread' && data.username === partner) {
-    socket.emit('read_messages', username);
+  if (data.status === 'unread' && data.authorId === partner_id) {
+    socket.emit('read_chat', data.chatId);
   }
 });
 
-socket.on('add_user', function(username) {
+socket.on('new_user', function(user_data) {
+  let data = JSON.parse(user_data);
   $('#user_list_online').
-      append('<div id=\'' + username +
+      append('<div id=\'' + data.id +
           '\' class=\'center-block user-chat\'><button onclick=changeChat(\'' +
-          username + '\') class=\'center-block username\'>' + username +
+          data.id + '\') class=\'center-block username\'>' + data.username +
           '</button></div>');
+  let curr_id = data.id;
+  users.curr_id = data.username;
 });
 
-socket.on('add_chat', function(username) {
-  $('#user_list').
-      append('<div id=\'' + username +
+socket.on('add_chat', function(chat_info) {
+  let data = JSON.parse(chat_info);
+  let userId = data.userId;
+  $('#user_list').append('<div id=\'' + userId +
           '\' class=\'center-block user-chat\'><button onclick=changeChat(\'' +
-          username + '\') class=\'center-block username\'>' + username +
-          '</button></div>');
+          userId  + '\') class=\'center-block username\'>' + users.userId + '</button></div>');
+  chats.userId = data.chatId;
+  changeChatHeader(users.userId, 'Online');
 });
 
-socket.on('remove_user', function(username) {
-  $('#user_list_online #' + username).remove();
+socket.on('offline_user', function(userId) {
+  $('#user_list_online #' + userId).remove();
 });
 
-socket.on('read_messages', function(username) { // username?
+socket.on('read_chat', function(userId) { // username?
   let unread_msgs = $('div.unread');
   unread_msgs.addClass('read');
   unread_msgs.removeClass('unread');
@@ -108,14 +110,19 @@ socket.on('read_messages', function(username) { // username?
 
 // -----------------------------------------------------------------------------
 
-let changeChat = function(username) {
+let changeChat = function(userId) {
+  let username = users.userId;
   $('.discussion').empty();
   $('input[name=partner]').val(username);
   $('#user_list').find('#' + username).find('div').remove();
 
-  partner = username;
+  partner_id = userId;
   changeChatHeader(username, 'Online');
-  socket.emit('change chat', username);
+  if (userId in chats) {
+    socket.emit('change_chat', chats.userId);
+  } else {
+    socket.emit('create_chat', userId);
+  }
 };
 
 let changeChatHeader = function(username, status) {
@@ -134,8 +141,7 @@ let changeChatHeader = function(username, status) {
 };
 
 // ToDo: integrate message format
-let msgFormat = function(
-    id, authorId, chatId, comment, time, status, mediaId, text) {
+let msgFormat = function(author, msg, status, time) {
   let content;
 
   if (author === username) {
@@ -166,17 +172,17 @@ $('#chat_form').submit(function(e) { // e?
   let attached_input = $('#attached_input');
 
   let text = message_input.val().replace(/\n/g, '<br/>');
-  let message = "{id: " + id +
-      ", authorId: " + authorId +
-      ", chatId: " + Id +
-      ", sent: " + time +
-      ", status: " + status +
-      ", mediaId: " + Id +
-      ", text: "+ text + "}"
+  let message = "{id: " + -1 +
+      ", authorId: " + my_Id +
+      ", chatId: " + chats.partner_Id +
+      ", sent: " + -1 +
+      ", status: " + "unread" +
+      ", mediaId: " + -1 +
+      ", text: "+ text + "}";
 
-  if (message !== '') {
+  if (text !== '') {
     message_input.val('');
-    socket.emit('receive_message', message);
+    socket.emit('send_message', message);
 
     return false;
   }
