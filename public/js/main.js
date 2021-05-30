@@ -14,12 +14,23 @@
 // socket.emit('send_message',      message);
 // socket.emit('change_chat',       chatId);
 // socket.emit('create_chat',       userId);
+const express = require('express');
+const bodyParser = require('body-parser');
+const socketio = require('socket.io')
+var app = express();
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+
+var server = app.listen(8080)
+var io = socketio.listen(server)
 
 let socket = io.connect('http://localhost:8080'); // io?
 let my_id = 0;
 let partner_id = 0;
 let users = {}; // store users
 let chats = {}; // store chats
+
 
 // -----------------------------------------------------------------------------
 
