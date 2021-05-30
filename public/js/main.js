@@ -112,13 +112,13 @@ $('#chat_form').submit(function(e) { // e?
       $('#status').empty().text(response);
     },
   });
-  attached_input.val('');
 
+  attached_input.val('');
   return false;
 });
 
 $('#message_input').keyup(function(e) {
-  if (e.keyCode === 13) {
+  if (e.keyCode === 13 && !e.shiftKey) {
     $('#chat_form').submit();
   }
   return true;
