@@ -15,7 +15,7 @@
 // socket.emit('change_chat',       chatId);
 // socket.emit('create_chat',       userId);
 
-let socket = new WebSocket("wss://8080"); // io?
+let socket = new WebSocket("ws://connection"); // io?
 
 let my_id = 0;
 let partner_id = 0;
@@ -53,7 +53,7 @@ socket.onmessage = function(message) {
     case 'offline_user':
       OfflineUser(data.userId);
       break;
-    case 'error_occured';
+    case 'error_occured':
       ErrorOccured();
       break;
     default:
