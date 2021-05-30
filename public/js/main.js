@@ -21,6 +21,8 @@ let username = '';
 let partner = '';
 // let online_status = 'offline';
 
+// -----------------------------------------------------------------------------
+
 socket.on('connect', function() {
   // If you need something when connecting
   // Now all the logic is on the server
@@ -104,51 +106,7 @@ socket.on('read_messages', function(username) { // username?
   unread_msgs.removeClass('unread');
 });
 
-// ToDo: integrate message handling
-$('#chat_form').submit(function(e) { // e?
-  let message_input = $('#message_input');
-  let attached_input = $('#attached_input');
-
-  let text = message_input.val().replace(/\n/g, '<br/>');
-  let message = "{id: " + id +
-      ", authorId: " + authorId +
-      ", chatId: " + Id +
-      ", sent: " + time +
-      ", status: " + status +
-      ", mediaId: " + Id +
-      ", text: "+ text + "}"
-
-  if (message !== '') {
-    message_input.val('');
-    socket.emit('receive_message', message);
-
-    return false;
-  }
-
-  if (attached_input.val() === '') {
-    return false;
-  }
-
-  $('#status').empty().text('File is uploading...');
-  $(this).ajaxSubmit({
-    error: function(xhr) { // error?
-      status('Error: ' + xhr.status); // status?
-    },
-    success: function(response) { // success?
-      $('#status').empty().text(response);
-    },
-  });
-  attached_input.val('');
-
-  return false;
-});
-
-$('#message_input').keyup(function(e) {
-  if (e.keyCode === 13) {
-    $('#chat_form').submit();
-  }
-  return true;
-});
+// -----------------------------------------------------------------------------
 
 let changeChat = function(username) {
   $('.discussion').empty();
@@ -199,3 +157,51 @@ let imgFormat = function(author, imgPath) {
       author + '</span></div><div class=\'media-body\'><img src=\'' + imgPath +
       '\' height=\'150\' alt="image"/></div></div>';
 };
+
+// -----------------------------------------------------------------------------
+
+// ToDo: integrate message handling
+$('#chat_form').submit(function(e) { // e?
+  let message_input = $('#message_input');
+  let attached_input = $('#attached_input');
+
+  let text = message_input.val().replace(/\n/g, '<br/>');
+  let message = "{id: " + id +
+      ", authorId: " + authorId +
+      ", chatId: " + Id +
+      ", sent: " + time +
+      ", status: " + status +
+      ", mediaId: " + Id +
+      ", text: "+ text + "}"
+
+  if (message !== '') {
+    message_input.val('');
+    socket.emit('receive_message', message);
+
+    return false;
+  }
+
+  if (attached_input.val() === '') {
+    return false;
+  }
+
+  $('#status').empty().text('File is uploading...');
+  $(this).ajaxSubmit({
+    error: function(xhr) { // error?
+      status('Error: ' + xhr.status); // status?
+    },
+    success: function(response) { // success?
+      $('#status').empty().text(response);
+    },
+  });
+  attached_input.val('');
+
+  return false;
+});
+
+$('#message_input').keyup(function(e) {
+  if (e.keyCode === 13) {
+    $('#chat_form').submit();
+  }
+  return true;
+});
