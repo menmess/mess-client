@@ -30,7 +30,7 @@ let my_id = 0;
 let partner_id = 0;
 let users = {}; // store users
 let chats = {}; // store chats
-
+let my_token = '';
 
 // -----------------------------------------------------------------------------
 
@@ -38,18 +38,21 @@ socket.on('connect', function() {
 
 });
 
+socket.on('receive_token', token) {
+  let token_field = $('#token');
+  token_field.addClass(token);
+  my_token = token;
+}
+
 socket.on('require_registration', function(userId) {
   let my_name = prompt('Enter usename:');
-  let token = prompt('Enter token:');
+  while(my_token === '') {
+    continue;
+  }
   my_id = userId;
-  socket.emit('register', {my_name, token});
-   
-  // customizing page data
-  $('input[name=username]').val(my_name);
-  $('input[name=partner]').val(my_name);
-  changeChatHeader(my_name, 'Online');
   partner_id = my_id;
   users.my_id = my_name;
+  Register(my_name, token);
   // there may be some more checks for the validity of the username
   // usernames with ';' break logic of page
   // I'm not sure to check here or on the server
@@ -99,13 +102,11 @@ socket.on('new_user', function(user_data) {
   users.curr_id = data.username;
 });
 
-socket.on('add_chat', function(chat_info) {
-  let data = JSON.parse(chat_info);
-  let userId = data.userId;
+socket.on('add_chat', function(userId, chatId) {
   $('#user_list').append('<div id=\'' + userId +
           '\' class=\'center-block user-chat\'><button onclick=changeChat(\'' +
           userId  + '\') class=\'center-block username\'>' + users.userId + '</button></div>');
-  chats.userId = data.chatId;
+  chats.userId = chatId;
   changeChatHeader(users.userId, 'Online');
 });
 
@@ -120,6 +121,15 @@ socket.on('read_chat', function(userId) { // username?
 });
 
 // -----------------------------------------------------------------------------
+
+let Register = function(name, token) {
+   socket.emit('register', {name, token});
+   
+  // customizing page data
+  $('input[name=username]').val(name);
+  $('input[name=partner]').val(name);
+  changeChatHeader(name, 'Online');
+}
 
 let changeChat = function(userId) {
   let username = users.userId;
@@ -175,6 +185,9 @@ let imgFormat = function(author, imgPath) {
       '\' height=\'150\' alt="image"/></div></div>';
 };
 
+let generateToken = function() {
+  socket.emit('generate_token');
+}
 // -----------------------------------------------------------------------------
 
 // ToDo: integrate message handling
@@ -219,6 +232,13 @@ $('#chat_form').submit(function(e) { // e?
 $('#message_input').keyup(function(e) {
   if (e.keyCode === 13) {
     $('#chat_form').submit();
+  }
+  return true;
+});
+
+$('#token_input').keyup(function(e) {
+  if (e.keyCode === 13) {
+    my_token = $('#token_input');
   }
   return true;
 });

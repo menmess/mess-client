@@ -38,6 +38,7 @@
           <div class="chat-header text-center">
             <p class="partner-name" id="partner_name"></p>
             <p class="partner-status" id="partner_status"></p>
+            <p class="partner-status" id="token"></p>
           </div>
 
           <div class="chat-body">
@@ -82,8 +83,10 @@
         </div>
 
       </div>
-
+      <div class='center-block user-chat'><button onclick=generateToken() class='center-block username'>Generate token</button></div>
+      <textarea id="token_input" placeholder="Enter token"></textarea>
       <div class="col-md-2 no-padding">
+
         <h3 class="text-center">Users</h3>
         <div class="chat-user-list" id="user_list_online"></div>
       </div>
