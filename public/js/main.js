@@ -1,4 +1,4 @@
-let socket = new WebSocket("ws://localhost:8082/connection"); // io?
+let socket = new WebSocket("ws://localhost:8081/connection"); // io?
 
 let my_id = '';
 let partner_id = '';
@@ -67,11 +67,12 @@ let ReceiveToken = function(token) {
 };
 
 let RequireRegistration = function(clientId) {
-  let my_name = prompt('Enter usename:');
+  let my_name = prompt('Enter username:');
   changeChatHeader(my_name, 'Online');
   my_id = clientId.toString();
   partner_id = clientId;
   users[my_id] = my_name;
+  registerToken();
   // there may be some more checks for the validity of the username
   // usernames with ';' break logic of page
   // I'm not sure to check here or on the server
@@ -79,15 +80,16 @@ let RequireRegistration = function(clientId) {
 
 let InvalidToken = function() { 
   alert('Wrong token, please try again');
+  registerToken();
 };
 
 let ReceiveMessage = function(message) {
   let data = JSON.parse(message);
   let user_list = $('#user_list');
-
-  if (data.authorId !== partner_id && data.authorId !== my_id) {
-    if (!user_list.find('#' + data.authorId).find('div').length) {
-      user_list.find('#' + data.authorId).
+  console.log(data);
+  if (data.authorId.toString() !== partner_id && data.authorId.toString() !== my_id) {
+    if (!user_list.find('#' + data.authorId.toString()).find('div').length) {
+      user_list.find('#' + data.authorId.toString()).
           append('<div><span></span><i class=\'fa fa-envelope\'></i></div>');
     }
     return;
@@ -95,12 +97,12 @@ let ReceiveMessage = function(message) {
 
   // if (data.type === 'text') {
     $('.discussion').
-        append(msgFormat(data.username, data.message, data.status, data.time.toDateString()));
+        append(msgFormat(users[data.authorId], data.text, data.status, data.sent));
   // } else if (data.type === 'img') {
     // $('.discussion').append(imgFormat(data.username, data.message));
   // }
 
-  if (data.status === 'unread' && data.authorId === partner_id) {
+  if (data.status !== 'READ' && data.authorId === partner_id) {
     socket.send(JSON.stringify({request : 'read_chat', chatId : data.chatId}));
   }
 };
@@ -163,7 +165,6 @@ let Register = function(name, token) {
 let changeChat = function(userId) {
   let str_id = userId.toString();
   let username = users[str_id];
-  console.log("Сhange chat:", userId, username);
   $('.discussion').empty();
   $('input[name=partner]').val(username);
   $('#user_list').find('#' + username).find('div').remove();
@@ -181,6 +182,8 @@ let changeChat = function(userId) {
       userId: partner_id,
     }));
   }
+
+  console.log("Сhange chat:", partner_id, users[partner_id]);
 };
 
 let changeChatHeader = function(username, status) {
@@ -201,7 +204,7 @@ let changeChatHeader = function(username, status) {
 // ToDo: integrate message format
 let msgFormat = function(author, msg, status, time) {
   let content;
-  if (author === username) {
+  if (author === users[my_id]) {
     content = '<div class=\'bubble recipient first\'><p>' + msg +
         '</p><div class=\'msg-status ' + status + '\'><em class=\'time\'>' +
         time + '</em> <i class=\'fa fa-check\'></i></div></div>';
@@ -225,11 +228,17 @@ let generateToken = function() {
   socket.send(JSON.stringify({request : 'generate_token'}));
 }
 
-let createNewNet = function () {
-  console.log("Create new net. ");
-  Register(users[my_id], "");
+let registerToken = function () {
+  let is_new_user = confirm('Do you want to create new netwotk?');
+  if (is_new_user) {
+    console.log("Create new net. ");
+    Register(users[my_id], "");
+  } else {
+    my_token = prompt('Enter token');
+    console.log("Get token: ", my_token);
+    Register(users[my_id], my_token);
+  }
 }
-
 // -----------------------------------------------------------------------------
 
 // ToDo: integrate message handling
@@ -273,15 +282,6 @@ $('#chat_form').submit(function(e) { // e?
 $('#message_input').keyup(function(e) {
   if (e.keyCode === 13) {
     $('#chat_form').submit();
-  }
-  return true;
-});
-
-$('#token_input').keyup(function(e) {
-  if (e.keyCode === 13) {
-    my_token = $('#token_input').val();
-    console.log("Get token: ", my_token);
-    Register(users[my_id], my_token);
   }
   return true;
 });
