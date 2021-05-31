@@ -1,4 +1,4 @@
-let socket = new WebSocket("ws://localhost:8081/connection"); // io?
+let socket = new WebSocket("ws://localhost:8082/connection"); // io?
 
 let my_id = '';
 let partner_id = '';
@@ -85,7 +85,7 @@ let ReceiveMessage = function(message) {
   let data = JSON.parse(message);
   let user_list = $('#user_list');
 
-  if (data.authorId !== partner_id && data.authorId !== users[my_id]) {
+  if (data.authorId !== partner_id && data.authorId !== my_id) {
     if (!user_list.find('#' + data.authorId).find('div').length) {
       user_list.find('#' + data.authorId).
           append('<div><span></span><i class=\'fa fa-envelope\'></i></div>');
@@ -95,7 +95,7 @@ let ReceiveMessage = function(message) {
 
   // if (data.type === 'text') {
     $('.discussion').
-        append(msgFormat(data.username, data.message, data.status, data.time));
+        append(msgFormat(data.username, data.message, data.status, data.time.toDateString()));
   // } else if (data.type === 'img') {
     // $('.discussion').append(imgFormat(data.username, data.message));
   // }
@@ -243,7 +243,7 @@ $('#chat_form').submit(function(e) { // e?
     request: 'send_message',
     chatId: chats[partner_id],
     text: text,
-    sent: d.getTime(),
+    time: d.getTime(),
   };
   console.log("Sending message... ", data);
   if (text !== '') {
