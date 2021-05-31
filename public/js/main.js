@@ -110,6 +110,11 @@ let ReceiveMessage = function(message) {
       append(
           MsgFormat(users[data.authorId], data.text, data.status, data.sent));
 
+  if (data.attachmentUrl !== null && data.attachmentUrl !== "null") {
+    $('.discussion').append(ImgFormat(users[data.authorId], "/media/" + data.attachmentUrl))
+  }
+
+
   if (data.status !== 'READ' && data.authorId.toString() === partner_id) {
     console.log("Sending read_messages");
     socket.send(JSON.stringify({request: 'read_messages', chatId: data.chatId}));
@@ -239,10 +244,18 @@ let MsgFormat = function(author, msg, status, time) {
 };
 
 // Image format
-let imgFormat = function(author, imgPath) {
-  return '<div class=\'media\'><div class=\'media-left\'><span class=\'author\'>' +
-      author + '</span></div><div class=\'media-body\'><img src=\'' + imgPath +
-      '\' height=\'150\' alt="image"/></div></div>';
+let ImgFormat = function(author, imgPath) {
+  if (author === users[my_id]) {
+    return '<div class="bubble recipient first">'
+        + '<div class=\'media\'>'
+        + '<div class=\'media-body\'><img src=\'' + imgPath +
+        '\' width=\'250\' alt="image"/></div></div></div>';
+  } else {
+    return '<div class="bubble sender first">'
+        + '<div class=\'media\'>'
+        + '<div class=\'media-body\'><img src=\'' + imgPath +
+        '\' width=\'250\' alt="image"/></div></div></div>';
+  }
 };
 
 let GenerateToken = function() {
@@ -261,6 +274,30 @@ let RegisterToken = function() {
     Register(users[my_id], my_token);
   }
 };
+
+const input = document.getElementById('attached_input');
+
+const uploadFile = (file) => {
+  if (file == null) {
+    return
+  }
+
+  let data = new FormData()
+  data.append("file", file)
+  data.append("name", file.name)
+
+  console.log("Uploading file: ", file.name)
+  fetch('/upload?filename=' + file.name, { // Your POST endpoint
+    method: 'POST',
+    body: data // This is your file object
+  }).then(
+      response => response.text()
+  ).catch(
+      error => console.log(error) // Handle the error response object
+  );
+  return file.name
+};
+
 // -----------------------------------------------------------------------------
 
 // ToDo: integrate message handling
@@ -275,30 +312,24 @@ $('#chat_form').submit(function(e) { // e?
     chatId: chats[partner_id],
     text: text,
     time: d.getTime(),
+    attachmentUrl: null
   };
-  console.log('Sending message... ', data);
+
   if (text !== '') {
     message_input.val('');
-    socket.send(JSON.stringify(data));
-    console.log('Sent.');
-    return false;
   }
 
-  if (attached_input.val() === '') {
-    return false;
+  if (attached_input.val() !== '') {
+    data.attachmentUrl = uploadFile(input.files[0])
+    attached_input.val('');
   }
 
-  $('#status').empty().text('File is uploading...');
-  $(this).ajaxSubmit({
-    error: function(xhr) { // error?
-      status('Error: ' + xhr.status); // status?
-    },
-    success: function(response) { // success?
-      $('#status').empty().text(response);
-    },
-  });
-  attached_input.val('');
-  return false;
+  console.log('Sending message... ', data);
+
+  socket.send(JSON.stringify(data));
+  console.log('Sent.');
+
+  return false
 });
 
 $('#message_input').keyup(function(e) {
