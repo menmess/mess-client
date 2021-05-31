@@ -95,8 +95,9 @@ let InvalidToken = function() {
   alert('Wrong token, please try again');
 };
 
-let ReceiveMessage = function(data) {
+let ReceiveMessage = function(message) {
   // debuging
+  let data = JSON.parse(message);
   let user_list = $('#user_list');
 
   if (data.authorId !== partner_id && data.authorId !== users.my_id) {
@@ -119,7 +120,8 @@ let ReceiveMessage = function(data) {
   }
 };
 
-let NewUser = function(data) {
+let NewUser = function(user) {
+  let data = JSON.parse(user);
   $('#user_list_online').
       append('<div id=\'' + data.id +
           '\' class=\'center-block user-chat\'><button onclick=changeChat(\'' +
