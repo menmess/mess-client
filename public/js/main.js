@@ -255,7 +255,20 @@ let registerToken = function() {
 // ToDo: integrate message handling
 $('#chat_form').submit(function(e) { // e?
   let message_input = $('#message_input');
-  let attached_input = $('#attached_input');
+  let filename = $('#filename');
+
+  let fullPath = filename.val()
+  if (fullPath) {
+    let startIndex = (fullPath.indexOf('\\') >= 0
+        ? fullPath.lastIndexOf('\\')
+        : fullPath.lastIndexOf('/'));
+    let result = fullPath.substring(startIndex);
+    if (result.indexOf('\\') === 0 || result.indexOf('/') === 0) {
+      result = result.substring(1);
+    }
+    filename.val(result)
+    alert(result);
+  }
 
   let text = message_input.val().replace(/\n/g, '<br/>');
   let d = new Date();
@@ -273,7 +286,7 @@ $('#chat_form').submit(function(e) { // e?
     return false;
   }
 
-  if (attached_input.val() === '') {
+  if (filename.val() === '') {
     return false;
   }
 
@@ -286,7 +299,7 @@ $('#chat_form').submit(function(e) { // e?
       $('#status').empty().text(response);
     },
   });
-  attached_input.val('');
+  filename.val('');
   return false;
 });
 
