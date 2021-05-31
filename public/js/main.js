@@ -239,18 +239,17 @@ $('#chat_form').submit(function(e) { // e?
 
   let text = message_input.val().replace(/\n/g, '<br/>');
   let d = new Date();
-  let message = {
+  let data = {
+    request: 'send_message',
     chatId: chats[partner_id],
     text: text,
     sent: d.getTime(),
   };
-  let data = {
-    request: 'send_message',
-    message: message
-  };
+  console.log("Sending message... ", data);
   if (text !== '') {
     message_input.val('');
     socket.send(JSON.stringify(data));
+    console.log("Sent.");
     return false;
   }
 
