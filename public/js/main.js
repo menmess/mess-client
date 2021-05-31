@@ -1,7 +1,7 @@
 let socket = new WebSocket("ws://localhost:8081/connection"); // io?
 
-let my_id = 0;
-let partner_id = 0;
+let my_id = '';
+let partner_id = '';
 let users = {}; // store users
 let chats = {}; // store chats
 let my_token = '';
@@ -62,16 +62,16 @@ socket.onerror = function(error) {
 
 let ReceiveToken = function(token) {
   my_token = token;
-  $('#token').addClass(token);
-  $('#token').text(token);
+  let myWindow = window.open("", "Token", "width=800,height=100");
+  myWindow.document.write("<p>"+ my_token +"</p>");
 };
 
 let RequireRegistration = function(clientId) {
   let my_name = prompt('Enter usename:');
   changeChatHeader(my_name, 'Online');
-  my_id = clientId;
+  my_id = clientId.toString();
   partner_id = clientId;
-  users.my_id = my_name;
+  users[my_id] = my_name;
   // there may be some more checks for the validity of the username
   // usernames with ';' break logic of page
   // I'm not sure to check here or on the server
@@ -85,7 +85,7 @@ let ReceiveMessage = function(message) {
   let data = JSON.parse(message);
   let user_list = $('#user_list');
 
-  if (data.authorId !== partner_id && data.authorId !== users.my_id) {
+  if (data.authorId !== partner_id && data.authorId !== users[my_id]) {
     if (!user_list.find('#' + data.authorId).find('div').length) {
       user_list.find('#' + data.authorId).
           append('<div><span></span><i class=\'fa fa-envelope\'></i></div>');
@@ -108,21 +108,25 @@ let ReceiveMessage = function(message) {
 let NewUser = function(user) {
   let data = JSON.parse(user);
   console.log("New user: ", data);
+  let str_id = data.id.toString();
+  users[str_id] = data.username;
   $('#user_list_online').
-      append('<div id=\'' + data.id +
+      append('<div id=\'' + str_id +
           '\' class=\'center-block user-chat\'><button onclick=changeChat(\'' +
-          data.id + '\') class=\'center-block username\'>' + data.username +
+      str_id + '\') class=\'center-block username\'>' + data.username +
           '</button></div>');
-  let curr_id = data.id;
-  users.curr_id = data.username;
+  console.log("All users:", users);
 };
 
 let AddChat = function(userId, chatId) {
-  $('#user_list').append('<div id=\'' + userId +
+  let str_id = userId.toString();
+
+  $('#user_list').append('<div id=\'' + str_id +
           '\' class=\'center-block user-chat\'><button onclick=changeChat(\'' +
-          userId  + '\') class=\'center-block username\'>' + users.userId + '</button></div>');
-  chats.userId = chatId;
-  let name = users.userId;
+        str_id  + '\') class=\'center-block username\'>' + users[str_id] + '</button></div>');
+
+  chats[str_id] = chatId;
+  let name = users[str_id];
   changeChatHeader(name, 'Online');
 };
 
@@ -131,7 +135,7 @@ let OfflineUser = function(userId) {
 };
 
 let ReadChat = function(userId) { // username?
-  if (userId === partner_id) {
+  if (userId.toString() === partner_id) {
     let unread_msgs = $('div.unread');
     unread_msgs.addClass('read');
     unread_msgs.removeClass('unread');
@@ -157,18 +161,19 @@ let Register = function(name, token) {
 }
 
 let changeChat = function(userId) {
-  let username = users.userId;
+  let str_id = userId.toString();
+  let username = users[str_id];
   console.log("Сhange chat:", userId, username);
   $('.discussion').empty();
   $('input[name=partner]').val(username);
   $('#user_list').find('#' + username).find('div').remove();
 
-  partner_id = userId;
+  partner_id = str_id;
   changeChatHeader(username, 'Online');
-  if (userId in chats) {
+  if (partner_id in chats) {
     socket.send(JSON.stringify({
       request:'change_chat', 
-      chatId: chats.userId
+      chatId: chats[partner_id]
     }));
   } else {
     socket.send(JSON.stringify({
@@ -222,7 +227,7 @@ let generateToken = function() {
 
 let createNewNet = function () {
   console.log("Create new net. ");
-  Register(users.my_id, "");
+  Register(users[my_id], "");
 }
 
 // -----------------------------------------------------------------------------
@@ -233,13 +238,11 @@ $('#chat_form').submit(function(e) { // e?
   let attached_input = $('#attached_input');
 
   let text = message_input.val().replace(/\n/g, '<br/>');
-  let message = {id:  + -1,
-    authorId: my_id,
-    chatId: chats.partner_id,
-    sent: -1,
-    status: "unread",
-    mediaId: -1,
-    text: text
+  let d = new Date();
+  let message = {
+    chatId: chats[partner_id],
+    text: text,
+    sent: d.getTime(),
   };
   let data = {
     request: 'send_message',
@@ -265,7 +268,6 @@ $('#chat_form').submit(function(e) { // e?
     },
   });
   attached_input.val('');
-
   return false;
 });
 
@@ -280,7 +282,7 @@ $('#token_input').keyup(function(e) {
   if (e.keyCode === 13) {
     my_token = $('#token_input').val();
     console.log("Get token: ", my_token);
-    Register(users.my_id, my_token);
+    Register(users[my_id], my_token);
   }
   return true;
 });
