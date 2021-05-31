@@ -15,7 +15,7 @@
 // socket.emit('change_chat',       chatId);
 // socket.emit('create_chat',       userId);
 
-let socket = new WebSocket("ws://connection"); // io?
+let socket = new WebSocket("ws://localhost:8081/connection"); // io?
 
 let my_id = 0;
 let partner_id = 0;
@@ -29,8 +29,9 @@ socket.onopen = function(e) {
   alert('Have connection');
 };
 
-socket.onmessage = function(message) {
-  let data = JSON.parse(message);
+socket.onmessage = function(message) {  
+  let data = JSON.parse(message.data);
+  console.log(data);
   switch (data.request) {
     case 'receive_token':
       ReceiveToken(data.token);
@@ -54,7 +55,7 @@ socket.onmessage = function(message) {
       OfflineUser(data.userId);
       break;
     case 'error_occured':
-      ErrorOccured();
+      ErrorOccured(data.message);
       break;
     default:
       break;
@@ -76,18 +77,15 @@ let ReceiveToken = function(token) {
   let token_field = $('#token');
   token_field.addClass(token);
   my_token = token;
+  Register(users.my_id, my_token);
 };
 
 let RequireRegistration = function(clientId) {
   let my_name = prompt('Enter usename:');
-  changeChatHeader(name, 'Online');
-  while(my_token === '') {
-    continue;
-  }
+  changeChatHeader(my_name, 'Online');
   my_id = clientId;
   partner_id = clientId;
   users.my_id = my_name;
-  Register(my_name, token);
   // there may be some more checks for the validity of the username
   // usernames with ';' break logic of page
   // I'm not sure to check here or on the server
@@ -95,17 +93,10 @@ let RequireRegistration = function(clientId) {
 
 let InvalidToken = function() { 
   alert('Wrong token, please try again');
-  while(my_token === '') {
-    continue;
-  }
-  Register(users.my_id, token);
 };
 
-let ReceiveMessage = function(message) {
+let ReceiveMessage = function(data) {
   // debuging
-  alert(message);
-
-  let data = JSON.parse(message);
   let user_list = $('#user_list');
 
   if (data.authorId !== partner_id && data.authorId !== users.my_id) {
@@ -128,8 +119,7 @@ let ReceiveMessage = function(message) {
   }
 };
 
-let NewUser = function(user_data) {
-  let data = JSON.parse(user_data);
+let NewUser = function(data) {
   $('#user_list_online').
       append('<div id=\'' + data.id +
           '\' class=\'center-block user-chat\'><button onclick=changeChat(\'' +
@@ -158,12 +148,13 @@ let ReadChat = function(userId) { // username?
   unread_msgs.removeClass('unread');
 };
 
-let ErrorOccured = function() {
-
+let ErrorOccured = function(message) {
+  alert("Error: ", message);
 };
 // -----------------------------------------------------------------------------
 
 let Register = function(name, token) {
+  console.log("Register", name, token);
   socket.send(JSON.stringify({
     request: 'register',
     username: name,
@@ -236,6 +227,7 @@ let imgFormat = function(author, imgPath) {
 };
 
 let generateToken = function() {
+  console.log("Generate token");
   socket.send(JSON.stringify({request : 'generate_token'}));
 }
 // -----------------------------------------------------------------------------
@@ -247,8 +239,8 @@ $('#chat_form').submit(function(e) { // e?
 
   let text = message_input.val().replace(/\n/g, '<br/>');
   let message = {id:  + -1,
-    authorId: my_Id,
-    chatId: chats.partner_Id,
+    authorId: my_id,
+    chatId: chats.partner_id,
     sent: -1,
     status: "unread",
     mediaId: -1,
@@ -293,6 +285,7 @@ $('#message_input').keyup(function(e) {
 $('#token_input').keyup(function(e) {
   if (e.keyCode === 13) {
     my_token = $('#token_input');
+    Register(users.my_id, my_token);
   }
   return true;
 });
