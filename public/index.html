@@ -60,14 +60,22 @@
               <input style="display: none;" type="file" name="attached" id="attached_input">
 
               <label for="message_input"></label>
+
               <textarea id="message_input" placeholder="Write a message..."></textarea>
 
-              <label class="icon-group" for="submit_btn">
+              <label class="icon-group" for="send_button">
                 <span></span>
                 <div><i class="fa fa-paper-plane"></i></div>
               </label>
 
-              <input style="display: none;" type="submit" id="submit_btn">
+              <input style="display: none;" type="submit" id="send_button">
+
+              <label class="icon-group" for="token_button">
+                <span></span>
+                <div><i class="fa fa-key"></i></div>
+              </label>
+
+              <input style="display: none;" onclick="generateToken()" id="token_button">
 
               <input type="hidden" name="username" value="">
 
@@ -82,13 +90,12 @@
         </div>
 
       </div>
-      <div class="col-md-2 no-padding">
 
+      <div class="col-md-2 no-padding">
         <h3 class="text-center">Users</h3>
         <div class="chat-user-list" id="user_list_online"></div>
       </div>
 
-      <div class='center-block user-chat'><button onclick=generateToken() class='center-block username'>Generate token</button></div>
     </div>
 
   </div>

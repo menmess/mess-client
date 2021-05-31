@@ -1,4 +1,4 @@
-let socket = new WebSocket("ws://localhost:8081/connection"); // io?
+let socket = new WebSocket('ws://localhost:8083/connection'); // io?
 
 let my_id = '';
 let partner_id = '';
@@ -9,12 +9,12 @@ let my_token = '';
 // -----------------------------------------------------------------------------
 
 socket.onopen = function(e) {
-  console.log("Socket: open");
+  console.log('Socket: open');
 };
 
-socket.onmessage = function(message) {  
+socket.onmessage = function(message) {
   let data = JSON.parse(message.data);
-  console.log("Socket: receive message: ", data);
+  console.log('Socket: receive message: ', data);
   switch (data.request) {
     case 'receive_token':
       ReceiveToken(data.token);
@@ -49,21 +49,29 @@ socket.onmessage = function(message) {
 };
 
 socket.onclose = function(event) {
-  console.log("Socket: close, ", event);
+  console.log('Socket: close, ', event);
 };
 
 socket.onerror = function(error) {
-  console.log("Socket: error, ", error);
+  console.log('Socket: error, ', error);
   alert(`[error] ${error.message}`);
-}
+};
 
 // -----------------------------------------------------------------------------
 
-
 let ReceiveToken = function(token) {
   my_token = token;
-  let myWindow = window.open("", "Token", "width=800,height=100");
-  myWindow.document.write("<p>"+ my_token +"</p>");
+  let width = 800;
+  let height = 50;
+  let left = (screen.width / 2) - (width / 2);
+  let top = (screen.height / 2) - (height / 2);
+
+  let tokenWindow = window.open(' ', 'Token',
+      'left=' + left + ', top=' + top + ',width=' + width + ',height=' +
+      height + '');
+
+  tokenWindow.document.write('<title>' + 'Token' + '</title>');
+  tokenWindow.document.write('<p>' + my_token + '</p>');
 };
 
 let RequireRegistration = function(clientId) {
@@ -78,7 +86,7 @@ let RequireRegistration = function(clientId) {
   // I'm not sure to check here or on the server
 };
 
-let InvalidToken = function() { 
+let InvalidToken = function() {
   alert('Wrong token, please try again');
   registerToken();
 };
@@ -87,7 +95,8 @@ let ReceiveMessage = function(message) {
   let data = JSON.parse(message);
   let user_list = $('#user_list');
   console.log(data);
-  if (data.authorId.toString() !== partner_id && data.authorId.toString() !== my_id) {
+  if (data.authorId.toString() !== partner_id && data.authorId.toString() !==
+      my_id) {
     if (!user_list.find('#' + data.authorId.toString()).find('div').length) {
       user_list.find('#' + data.authorId.toString()).
           append('<div><span></span><i class=\'fa fa-envelope\'></i></div>');
@@ -96,36 +105,38 @@ let ReceiveMessage = function(message) {
   }
 
   // if (data.type === 'text') {
-    $('.discussion').
-        append(msgFormat(users[data.authorId], data.text, data.status, data.sent));
+  $('.discussion').
+      append(
+          msgFormat(users[data.authorId], data.text, data.status, data.sent));
   // } else if (data.type === 'img') {
-    // $('.discussion').append(imgFormat(data.username, data.message));
+  // $('.discussion').append(imgFormat(data.username, data.message));
   // }
 
   if (data.status !== 'READ' && data.authorId === partner_id) {
-    socket.send(JSON.stringify({request : 'read_chat', chatId : data.chatId}));
+    socket.send(JSON.stringify({request: 'read_chat', chatId: data.chatId}));
   }
 };
 
 let NewUser = function(user) {
   let data = JSON.parse(user);
-  console.log("New user: ", data);
+  console.log('New user: ', data);
   let str_id = data.id.toString();
   users[str_id] = data.username;
   $('#user_list_online').
       append('<div id=\'' + str_id +
           '\' class=\'center-block user-chat\'><button onclick=changeChat(\'' +
-      str_id + '\') class=\'center-block username\'>' + data.username +
+          str_id + '\') class=\'center-block username\'>' + data.username +
           '</button></div>');
-  console.log("All users:", users);
+  console.log('All users:', users);
 };
 
 let AddChat = function(userId, chatId) {
   let str_id = userId.toString();
 
   $('#user_list').append('<div id=\'' + str_id +
-          '\' class=\'center-block user-chat\'><button onclick=changeChat(\'' +
-        str_id  + '\') class=\'center-block username\'>' + users[str_id] + '</button></div>');
+      '\' class=\'center-block user-chat\'><button onclick=changeChat(\'' +
+      str_id + '\') class=\'center-block username\'>' + users[str_id] +
+      '</button></div>');
 
   chats[str_id] = chatId;
   let name = users[str_id];
@@ -145,22 +156,22 @@ let ReadChat = function(userId) { // username?
 };
 
 let ErrorOccured = function(message) {
-  alert("Error: " + message);
+  alert('Error: ' + message);
 };
 // -----------------------------------------------------------------------------
 
 let Register = function(name, token) {
-  console.log("Register", name, my_id, token);
+  console.log('Register', name, my_id, token);
   socket.send(JSON.stringify({
     request: 'register',
     username: name,
     token: token,
   }));
-   
+
   // customizing page data
   $('input[name=username]').val(name);
   $('input[name=partner]').val(name);
-}
+};
 
 let changeChat = function(userId) {
   let str_id = userId.toString();
@@ -173,17 +184,17 @@ let changeChat = function(userId) {
   changeChatHeader(username, 'Online');
   if (partner_id in chats) {
     socket.send(JSON.stringify({
-      request:'change_chat', 
-      chatId: chats[partner_id]
+      request: 'change_chat',
+      chatId: chats[partner_id],
     }));
   } else {
     socket.send(JSON.stringify({
-      request:'create_chat', 
+      request: 'create_chat',
       userId: partner_id,
     }));
   }
 
-  console.log("Сhange chat:", partner_id, users[partner_id]);
+  console.log('Сhange chat:', partner_id, users[partner_id]);
 };
 
 let changeChatHeader = function(username, status) {
@@ -224,21 +235,21 @@ let imgFormat = function(author, imgPath) {
 };
 
 let generateToken = function() {
-  console.log("Generate token.");
-  socket.send(JSON.stringify({request : 'generate_token'}));
-}
+  console.log('Generate token.');
+  socket.send(JSON.stringify({request: 'generate_token'}));
+};
 
-let registerToken = function () {
+let registerToken = function() {
   let is_new_user = confirm('Do you want to create new netwotk?');
   if (is_new_user) {
-    console.log("Create new net. ");
-    Register(users[my_id], "");
+    console.log('Create new net. ');
+    Register(users[my_id], '');
   } else {
     my_token = prompt('Enter token');
-    console.log("Get token: ", my_token);
+    console.log('Get token: ', my_token);
     Register(users[my_id], my_token);
   }
-}
+};
 // -----------------------------------------------------------------------------
 
 // ToDo: integrate message handling
@@ -254,11 +265,11 @@ $('#chat_form').submit(function(e) { // e?
     text: text,
     time: d.getTime(),
   };
-  console.log("Sending message... ", data);
+  console.log('Sending message... ', data);
   if (text !== '') {
     message_input.val('');
     socket.send(JSON.stringify(data));
-    console.log("Sent.");
+    console.log('Sent.');
     return false;
   }
 

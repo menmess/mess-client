@@ -9,7 +9,6 @@ html, body {
     background: linear-gradient(45deg, #0098d8, #37bbe4, #caf0f8);
 }
 
-/*Set of css for displaying messages in bubbles*/
 .discussion {
     margin: 0 auto;
     display: flex;
@@ -195,7 +194,7 @@ html, body {
     font-family: 'PT Sans', serif;
     font-size: 20px;
     display: inline-block;
-    width: 78%;
+    width: 67%;
     margin-bottom: 10px;
     height: 100%;
     color: #0f0a01;
