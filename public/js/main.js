@@ -63,10 +63,11 @@ socket.onmessage = function(message) {
 };
 
 socket.onclose = function(event) {
-
+  console.log(event);
 };
 
 socket.onerror = function(error) {
+  console.log(error);
   alert(`[error] ${error.message}`);
 }
 
@@ -74,10 +75,9 @@ socket.onerror = function(error) {
 
 
 let ReceiveToken = function(token) {
-  let token_field = $('#token');
-  token_field.addClass(token);
   my_token = token;
-  Register(users.my_id, my_token);
+  $('#token').addClass(token);
+  $('#token').text(token);
 };
 
 let RequireRegistration = function(clientId) {
@@ -149,7 +149,7 @@ let ReadChat = function(userId) { // username?
 };
 
 let ErrorOccured = function(message) {
-  alert("Error: ", message);
+  alert("Error: " + message);
 };
 // -----------------------------------------------------------------------------
 
@@ -230,6 +230,12 @@ let generateToken = function() {
   console.log("Generate token");
   socket.send(JSON.stringify({request : 'generate_token'}));
 }
+
+let createNewNet = function () {
+  console.log("Create new");
+  Register(users.my_id, "");
+}
+
 // -----------------------------------------------------------------------------
 
 // ToDo: integrate message handling
@@ -284,7 +290,8 @@ $('#message_input').keyup(function(e) {
 
 $('#token_input').keyup(function(e) {
   if (e.keyCode === 13) {
-    my_token = $('#token_input');
+    my_token = $('#token_input').val();
+    console.log(my_token);
     Register(users.my_id, my_token);
   }
   return true;
