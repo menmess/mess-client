@@ -1,0 +1,245 @@
+html {
+    font-family: 'PT Sans', Georgia, serif;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    background: #e1e0dd;
+    background: linear-gradient(45deg, #0098d8, #37bbe4, #caf0f8);
+}
+
+.discussion {
+    margin: 0 auto;
+    display: flex;
+    flex-flow: column wrap;
+}
+
+.discussion > .bubble {
+    border-radius: 1em;
+    padding: 0.25em 0.75em;
+    margin: 0.0625em;
+    max-width: 50%;
+    font-size: 20px;
+}
+
+.discussion > .bubble.sender {
+    align-self: flex-start;
+    background-color: rgb(251, 251, 251);
+}
+
+.discussion > .bubble.recipient {
+    align-self: flex-end;
+    background-color: #fbfbfb;
+}
+
+.discussion > .bubble.sender.first {
+    border-bottom-left-radius: 0.1em;
+    word-break: break-all;
+}
+
+.discussion > .bubble.recipient.first {
+    border-bottom-right-radius: 0.1em;
+    word-break: break-all;
+}
+
+.discussion p {
+    margin: 0;
+}
+
+.discussion .msg-status {
+    font-size: 12px;
+    text-align: right;
+}
+
+.discussion .msg-status.unread {
+    color: #b7c7bd;
+}
+
+.discussion .msg-status.read {
+    color: #6dd5fa;
+}
+
+.discussion .msg-status .time {
+    color: #b7c7bd;
+}
+
+.chat-panel {
+    background: rgba(255, 200, 255, 0.3);
+    box-shadow: 1px 1px 12px #0000001a;
+    height: 87%;
+    border-radius: 15px;
+}
+
+.chat-user-list {
+    padding: 5px;
+    overflow-y: scroll;
+    height: 90%;
+}
+
+.chat-user-list::-webkit-scrollbar {
+    display: none;
+}
+
+.user-chat {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    border-bottom: 1px solid #5c58584f;
+}
+
+.user-chat .username {
+    border: none;
+    background: none;
+    word-break: break-all;
+    font-size: 20px;
+    color: rgb(53, 52, 47);
+    max-width: 80%;
+}
+
+.user-chat .username:hover {
+    color: #35342f;
+    font-size: 21px;
+}
+
+.user-chat div {
+    position: absolute;
+    display: inline-block;
+    top: 0;
+    bottom: 0;
+    padding: 3px;
+}
+
+.user-chat span {
+    display: inline-block;
+    vertical-align: middle;
+    height: 100%;
+}
+
+.user-chat i {
+    display: inline-block;
+    vertical-align: middle;
+    color: rgba(121, 141, 160, 0.849);
+}
+
+.chat-central-area {
+    background: rgba(0, 0, 32, 0.2);
+    height: 100%;
+    border-radius: 15px;
+    box-shadow: 1px 1px 12px #0000001a;
+}
+
+.chat-body {
+    padding: 20px;
+    height: 79%;
+    overflow-y: scroll;
+}
+
+.chat-body::-webkit-scrollbar {
+    display: none;
+}
+
+.chat-header {
+    padding: 10px;
+    background: rgb(244, 244, 244);
+    height: 10%;
+    border-radius: 15px;
+    box-shadow: 1px 1px 12px #0000001a;
+}
+
+.partner-name {
+    margin: 0;
+    font-size: 20px;
+}
+
+.partner-status {
+    margin: 0;
+    font-size: 15px;
+}
+
+.partner-status.online {
+    color: #00b8b8;
+}
+
+.partner-status.offline {
+    color: #de3d83;
+}
+
+.chat-footer {
+    /*margin-top: 25px;*/
+    background: rgb(244, 244, 244);
+    height: 11%;
+    border-radius: 15px;
+    vertical-align: middle;
+    box-shadow: 1px 1px 12px #0000001a;
+}
+
+.chat-footer form input {
+    background: rgba(255, 255, 255, 0.00);
+    bottom: 0;
+    left: 0;
+    border: none;
+    outline: none;
+    font-weight: 300;
+    vertical-align: middle
+}
+
+.chat-footer textarea {
+    background: rgba(255, 255, 255, 0.00);
+    border: none;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    outline: none;
+    font-weight: 300;
+    font-family: 'PT Sans', serif;
+    font-size: 20px;
+    display: inline-block;
+    width: 67%;
+    margin-bottom: 10px;
+    height: 100%;
+    color: #0f0a01;
+    resize: none;
+}
+
+.chat-footer textarea::placeholder {
+    color: #a5a6a9;
+}
+
+.chat-footer textarea::-webkit-scrollbar {
+    display: none;
+}
+
+.icon-group {
+    display: inline-block;
+    vertical-align: top;
+    height: 100%;
+    width: 10%;
+    text-align: center;
+}
+
+.icon-group i {
+    font-size: 35px;
+    color: rgb(165, 166, 169);
+}
+
+.icon-group i:hover {
+    font-size: 36px;
+    color: rgb(165, 166, 169);
+}
+
+.icon-group div {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.icon-group span {
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+}
+
+.no-padding {
+    padding: 0;
+}
+
+
