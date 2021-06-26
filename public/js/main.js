@@ -1,4 +1,4 @@
-let socket = new WebSocket('ws://localhost:8081/connection'); // io?
+let socket = new WebSocket('ws://' + location.host + '/connection');
 
 let my_id = '';
 let partner_id = '';
