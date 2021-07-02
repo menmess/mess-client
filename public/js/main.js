@@ -277,7 +277,7 @@ let RegisterToken = function() {
 
 const input = document.getElementById('attached_input');
 
-const uploadFile = (file) => {
+async function uploadFile(file) {
   if (file == null) {
     return
   }
@@ -287,21 +287,31 @@ const uploadFile = (file) => {
   data.append("name", file.name)
 
   console.log("Uploading file: ", file.name)
-  fetch('/upload?filename=' + file.name, { // Your POST endpoint
-    method: 'POST',
-    body: data // This is your file object
-  }).then(
-      response => response.text()
-  ).catch(
-      error => console.log(error) // Handle the error response object
-  );
-  return file.name
-};
+  try {
+    let response = await fetch('/upload?filename=' + file.name, { // Your POST endpoint
+      method: 'POST',
+      body: data // This is your file object
+    }).then(
+        response => response.text()
+    ).then(
+        text => {
+          if (text !== "OK") {
+            throw "Server returned error: " + text
+          }
+          return text
+        }
+    );
+  } catch (error) {
+    console.log("File sending error: " + error)
+    alert("Failed to load file " + file.name)
+    return false
+  }
+  return true
+}
 
 // -----------------------------------------------------------------------------
 
-// ToDo: integrate message handling
-$('#chat_form').submit(function(e) { // e?
+async function sendMessage() {
   let message_input = $('#message_input');
   let attached_input = $('#attached_input');
 
@@ -320,7 +330,11 @@ $('#chat_form').submit(function(e) { // e?
   }
 
   if (attached_input.val() !== '') {
-    data.attachmentUrl = uploadFile(input.files[0])
+    let is_uploaded = await uploadFile(input.files[0]);
+    if (!is_uploaded) {
+      return false;
+    }
+    data.attachmentUrl = input.files[0].name
     attached_input.val('');
   }
 
@@ -328,8 +342,17 @@ $('#chat_form').submit(function(e) { // e?
 
   socket.send(JSON.stringify(data));
   console.log('Sent.');
+  return true;
+}
 
-  return false
+// ToDo: integrate message handling
+$('#chat_form').submit(function(e) { // e?
+  sendMessage().then(status => {
+      if (!status) {
+        console.log("Message was not sent")
+      }
+  });
+  return false;
 });
 
 $('#message_input').keyup(function(e) {
