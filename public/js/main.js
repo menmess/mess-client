@@ -288,17 +288,15 @@ async function uploadFile(file) {
 
   console.log("Uploading file: ", file.name)
   try {
-    let response = await fetch('/upload?filename=' + file.name, { // Your POST endpoint
+    await fetch('/upload?filename=' + file.name, { // Your POST endpoint
       method: 'POST',
       body: data // This is your file object
     }).then(
-        response => response.text()
-    ).then(
-        text => {
-          if (text !== "OK") {
-            throw "Server returned error: " + text
+        response => {
+          if (!response.ok) {
+            throw "Server returned error: " + response.statusMessage
           }
-          return text
+          return response.text()
         }
     );
   } catch (error) {
